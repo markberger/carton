@@ -8,10 +8,6 @@ import (
 	"net/http"
 )
 
-func return404(w http.ResponseWriter) {
-	http.Error(w, "404 page not found", 404)
-}
-
 func loginHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
@@ -21,8 +17,8 @@ func loginHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 				return
 			}
 
-			username := r.FormValue("user")
-			password := r.FormValue("pass")
+			username := r.PostFormValue("user")
+			password := r.PostFormValue("pass")
 
 			if username == "" || password == "" {
 				http.Error(w, "bad arguments", 400)
