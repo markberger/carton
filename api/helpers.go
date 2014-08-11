@@ -21,22 +21,31 @@ func return404(w http.ResponseWriter) {
  *  API Testing Helpers
  */
 
-type HandleTester func(method string, params url.Values) *httptest.ResponseRecorder
+type HandleTester func(
+	method string,
+	path string,
+	params url.Values,
+) *httptest.ResponseRecorder
 
-// Given a path and a http.Handler, generate a HandleTester which
-// will test its given input against the supplied path and handler.
+// Given the current test runner and an http.Handler, generate a
+// HandleTester which will test its given input against the
+// supplied path and handler.
 
 func GenerateHandleTester(
 	t *testing.T,
-	path string,
 	handleFunc http.Handler,
 ) HandleTester {
 
-	// Given a method type ("GET", "POST", etc) and parameters,
-	// serve the response against the handler and return the
-	// ResponseRecorder.
+	// Given a method type ("GET", "POST", etc), path, and
+	// parameters, serve the response against the handler and
+	// return the ResponseRecorder.
 
-	return func(method string, params url.Values) *httptest.ResponseRecorder {
+	return func(
+		method string,
+		path string,
+		params url.Values,
+	) *httptest.ResponseRecorder {
+
 		req, err := http.NewRequest(
 			method,
 			path,

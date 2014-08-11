@@ -12,10 +12,10 @@ func TestLoginHandler(t *testing.T) {
 	mockDb := NewMockDbManager(false)
 	jar := sessions.NewCookieStore([]byte("secret key"))
 	loginHandle := loginHandler(mockDb, jar)
-	test := GenerateHandleTester(t, "/login", loginHandle)
+	test := GenerateHandleTester(t, loginHandle)
 
 	// Test GET request
-	w := test("GET", url.Values{})
+	w := test("GET", "/login", url.Values{})
 	if w.Code != http.StatusNotFound {
 		t.Errorf(
 			"GET /login returned %v. Expected %v",
@@ -40,7 +40,7 @@ func TestLoginHandler(t *testing.T) {
 	}
 
 	for _, params := range badParams {
-		w := test("POST", params)
+		w := test("POST", "/login", params)
 		if w.Code != http.StatusBadRequest {
 			t.Errorf(
 				"POST /login: bad input returned %v. Expected %v.",
@@ -61,7 +61,7 @@ func TestLoginHandler(t *testing.T) {
 		"pass": []string{"test pass"},
 	}
 
-	w = test("POST", goodParams)
+	w = test("POST", "/login", goodParams)
 	if w.Code != http.StatusOK {
 		t.Errorf(
 			"POST /login: good input returned %v. Expected %v.",
