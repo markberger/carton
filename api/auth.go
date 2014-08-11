@@ -13,7 +13,7 @@ func loginHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 		if r.Method == "POST" {
 			session, _ := jar.Get(r, "carton-session")
 			if _, ok := session.Values["user"]; ok {
-				http.Error(w, "already signed in", 400)
+				http.Error(w, "already signed in", http.StatusBadRequest)
 				return
 			}
 
@@ -21,25 +21,33 @@ func loginHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 			password := r.PostFormValue("pass")
 
 			if username == "" || password == "" {
-				http.Error(w, "bad arguments", 400)
+				http.Error(w, "bad arguments", http.StatusBadRequest)
 				return
 			}
 
 			dbHash := db.GetPwdHash(username)
 			if dbHash == nil {
-				http.Error(w, "user password combo doesn't exist", 400)
+				http.Error(
+					w,
+					"user password combo doesn't exist",
+					http.StatusBadRequest,
+				)
 				return
 			}
 
 			err := bcrypt.CompareHashAndPassword(dbHash, []byte(password))
 			if err != nil {
-				http.Error(w, "user password combo doesn't exist", 400)
+				http.Error(
+					w,
+					"user password combo doesn't exist",
+					http.StatusBadRequest,
+				)
 				return
 			}
 			session.Values["user"] = username
 			session.Save(r, w)
 			fmt.Fprintln(w, "login succeeded")
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 		} else {
 			return404(w)
 		}
@@ -51,7 +59,7 @@ func registerHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 		if r.Method == "POST" {
 			session, _ := jar.Get(r, "carton-session")
 			if _, ok := session.Values["user"]; ok {
-				http.Error(w, "already signed in", 400)
+				http.Error(w, "already signed in", http.StatusBadRequest)
 				return
 			}
 			username := r.FormValue("user")
@@ -62,30 +70,38 @@ func registerHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 				pass1 == "" ||
 				pass2 == "" ||
 				pass1 != pass2 {
-				http.Error(w, "bad arguments", 400)
+				http.Error(w, "bad arguments", http.StatusBadRequest)
 			}
 
 			if db.IsUser(username) {
-				http.Error(w, "user already exists", 400)
+				http.Error(w, "user already exists", http.StatusBadRequest)
 				return
 			}
 
 			bytePass := []byte(pass1)
 			hash, err := bcrypt.GenerateFromPassword(bytePass, bcrypt.DefaultCost)
 			if err != nil {
-				http.Error(w, "error hashing password", 500)
+				http.Error(
+					w,
+					"error hashing password",
+					http.StatusInternalServerError,
+				)
 				return
 			}
 
 			err = db.RegisterUser(username, hash)
 			if err != nil {
-				http.Error(w, "unable to add user", 500)
+				http.Error(
+					w,
+					"unable to add user",
+					http.StatusInternalServerError,
+				)
 				return
 			}
 			session.Values["user"] = username
 			session.Save(r, w)
 			fmt.Fprintf(w, "Successfully registered %v", username)
-			w.WriteHeader(201)
+			w.WriteHeader(http.StatusCreated)
 		} else {
 			return404(w)
 		}
@@ -97,12 +113,12 @@ func logoutHandler(jar *sessions.CookieStore) http.Handler {
 		if r.Method == "POST" {
 			session, _ := jar.Get(r, "carton-session")
 			if _, ok := session.Values["user"]; !ok {
-				http.Error(w, "no user to sign out", 400)
+				http.Error(w, "no user to sign out", http.StatusBadRequest)
 				return
 			}
 			delete(session.Values, "user")
 			fmt.Fprintln(w, "Successfully logged out")
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 		} else {
 			return404(w)
 		}
