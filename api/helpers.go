@@ -76,6 +76,10 @@ func NewMockDbManager(registrationError bool) *MockDbManager {
 	return &db
 }
 
+func (db *MockDbManager) Close() error {
+	return nil
+}
+
 func (db *MockDbManager) IsUser(user string) bool {
 	_, ok := db.users[user]
 	return ok

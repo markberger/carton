@@ -27,6 +27,10 @@ func NewBoltManager(dbPath string) (*BoltManager, error) {
 	return &BoltManager{db}, nil
 }
 
+func (m *BoltManager) Close() error {
+	return m.db.Close()
+}
+
 func (m *BoltManager) IsUser(user string) bool {
 	pwdHash := m.GetPwdHash(user)
 	if pwdHash == nil {
