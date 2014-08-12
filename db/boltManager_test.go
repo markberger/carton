@@ -44,6 +44,9 @@ func TestNewBoltManager(t *testing.T) {
 	if !createdUsersBucket {
 		t.Errorf("'users' bucket does not exist")
 	}
+
+	m.Close()
+	os.Remove(tempDb)
 }
 
 func TestUserRegistration(t *testing.T) {
@@ -67,4 +70,6 @@ func TestUserRegistration(t *testing.T) {
 		t.Errorf("failed to register 'test user'")
 	}
 
+	m.Close()
+	os.Remove(tempDb)
 }
