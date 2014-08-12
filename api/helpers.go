@@ -52,7 +52,7 @@ func GenerateHandleTester(
 			strings.NewReader(params.Encode()),
 		)
 		if err != nil {
-			t.Errorf("%v\n", err)
+			t.Errorf("%v", err)
 		}
 		req.Header.Set(
 			"Content-Type",

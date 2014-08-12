@@ -100,8 +100,8 @@ func registerHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 			}
 			session.Values["user"] = username
 			session.Save(r, w)
-			fmt.Fprintf(w, "Successfully registered %v", username)
 			w.WriteHeader(http.StatusCreated)
+			fmt.Fprintf(w, "Successfully registered %v", username)
 		} else {
 			return404(w)
 		}
@@ -117,6 +117,7 @@ func logoutHandler(jar *sessions.CookieStore) http.Handler {
 				return
 			}
 			delete(session.Values, "user")
+			session.Save(r, w)
 			fmt.Fprintln(w, "Successfully logged out")
 			w.WriteHeader(http.StatusOK)
 		} else {
