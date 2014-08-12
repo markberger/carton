@@ -16,7 +16,7 @@ func TestLoginHandler(t *testing.T) {
 	test := GenerateHandleTester(t, loginHandle)
 
 	// Test GET request
-	w := test("GET", "/login", url.Values{})
+	w := test("GET", url.Values{})
 	if w.Code != http.StatusNotFound {
 		t.Errorf(
 			"GET /login returned %v. Expected %v",
@@ -41,7 +41,7 @@ func TestLoginHandler(t *testing.T) {
 	}
 
 	for _, params := range badParams {
-		w := test("POST", "/login", params)
+		w := test("POST", params)
 		if w.Code != http.StatusBadRequest {
 			t.Errorf(
 				"POST /login: bad input returned %v. Expected %v.",
@@ -62,7 +62,7 @@ func TestLoginHandler(t *testing.T) {
 		"pass": []string{"test pass"},
 	}
 
-	w = test("POST", "/login", goodParams)
+	w = test("POST", goodParams)
 	if w.Code != http.StatusOK {
 		t.Errorf(
 			"POST /login: good input returned %v. Expected %v.",
@@ -79,7 +79,7 @@ func TestLogoutHandler(t *testing.T) {
 
 	// Test logout without a logged in user is registered
 	// as a bad request.
-	w := test("POST", "/logout", url.Values{})
+	w := test("POST", url.Values{})
 	if w.Code != http.StatusBadRequest {
 		t.Errorf(
 			"POST /logout: without user returned %v. Expected %v.",
@@ -90,7 +90,7 @@ func TestLogoutHandler(t *testing.T) {
 
 	// Test logout with logged in user returns as a good
 	// request.
-	req, err := http.NewRequest("POST", "/logout", nil)
+	req, err := http.NewRequest("POST", "", nil)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -116,7 +116,7 @@ func TestRegisterHandle(t *testing.T) {
 	test := GenerateHandleTester(t, registerHandle)
 
 	// Test GET request
-	w := test("GET", "/register", url.Values{})
+	w := test("GET", url.Values{})
 	if w.Code != http.StatusNotFound {
 		t.Errorf(
 			"GET /register returned %v. Expected %v",
@@ -154,7 +154,7 @@ func TestRegisterHandle(t *testing.T) {
 	}
 
 	for i := range badParams {
-		w := test("POST", "/register", badParams[i])
+		w := test("POST", badParams[i])
 		if w.Code != expectedCode[i] {
 			t.Errorf(
 				"POST /register: bad input returned %v. Expected %v.",
@@ -165,7 +165,7 @@ func TestRegisterHandle(t *testing.T) {
 	}
 
 	// Test register fails when user already logged in
-	req, err := http.NewRequest("POST", "/register", nil)
+	req, err := http.NewRequest("POST", "", nil)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -186,7 +186,7 @@ func TestRegisterHandle(t *testing.T) {
 	mockDb = NewMockDbManager(false)
 	registerHandle = registerHandler(mockDb, jar)
 	test = GenerateHandleTester(t, registerHandle)
-	w = test("POST", "/register", goodParams)
+	w = test("POST", goodParams)
 	if w.Code != http.StatusCreated {
 		t.Errorf(
 			"POST /register: good input returned %v. Expected %v.",

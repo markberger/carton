@@ -23,7 +23,6 @@ func return404(w http.ResponseWriter) {
 
 type HandleTester func(
 	method string,
-	path string,
 	params url.Values,
 ) *httptest.ResponseRecorder
 
@@ -42,13 +41,12 @@ func GenerateHandleTester(
 
 	return func(
 		method string,
-		path string,
 		params url.Values,
 	) *httptest.ResponseRecorder {
 
 		req, err := http.NewRequest(
 			method,
-			path,
+			"",
 			strings.NewReader(params.Encode()),
 		)
 		if err != nil {
