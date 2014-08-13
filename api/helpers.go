@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"github.com/markberger/carton/common"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -98,4 +99,8 @@ func (db *MockDbManager) GetPwdHash(user string) []byte {
 	} else {
 		return val
 	}
+}
+
+func (db *MockDbManager) AddFile(c *common.CartonFile) error {
+	return nil
 }

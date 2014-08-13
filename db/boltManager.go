@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/boltdb/bolt"
+	"github.com/markberger/carton/common"
 )
 
 type BoltManager struct {
@@ -18,7 +19,8 @@ func NewBoltManager(dbPath string) (*BoltManager, error) {
 		if err != nil {
 			return err
 		}
-		return nil
+		_, err = tx.CreateBucketIfNotExists([]byte("files"))
+		return err
 	})
 
 	if err != nil {
@@ -58,6 +60,19 @@ func (m *BoltManager) RegisterUser(user string, hash []byte) error {
 	err := m.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("users"))
 		err := b.Put([]byte(user), hash)
+		return err
+	})
+	return err
+}
+
+func (m *BoltManager) AddFile(c *common.CartonFile) error {
+	err := m.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("files"))
+		file, err := c.GobEncode()
+		if err != nil {
+			return err
+		}
+		err = b.Put([]byte(c.Name), file)
 		return err
 	})
 	return err

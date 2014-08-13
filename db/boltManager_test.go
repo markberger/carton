@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/boltdb/bolt"
+	"github.com/markberger/carton/common"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -72,4 +73,25 @@ func TestUserRegistration(t *testing.T) {
 
 	m.Close()
 	os.Remove(tempDb)
+}
+
+func TestAddFile(t *testing.T) {
+	tempDb := getTempDb()
+	if tempDb == "" {
+		t.Skip("Cannot create temp file")
+	}
+
+	m, _ := NewBoltManager(tempDb)
+	c := &common.CartonFile{
+		"file name",
+		"md5 hash",
+		"/fake/path",
+		[]byte("file pass"),
+		"owner",
+	}
+
+	err := m.AddFile(c)
+	if err != nil {
+		t.Errorf("Error adding file: %v", err)
+	}
 }
