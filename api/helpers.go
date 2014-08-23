@@ -28,17 +28,16 @@ type HandleTester func(
 ) *httptest.ResponseRecorder
 
 // Given the current test runner and an http.Handler, generate a
-// HandleTester which will test its given input against the
-// supplied path and handler.
+// HandleTester which will test its the handler against its input
 
 func GenerateHandleTester(
 	t *testing.T,
 	handleFunc http.Handler,
 ) HandleTester {
 
-	// Given a method type ("GET", "POST", etc), path, and
-	// parameters, serve the response against the handler and
-	// return the ResponseRecorder.
+	// Given a method type ("GET", "POST", etc) and
+	// parameters, serve the response against the handler
+	// and return the ResponseRecorder.
 
 	return func(
 		method string,
@@ -103,4 +102,11 @@ func (db *MockDbManager) GetPwdHash(user string) []byte {
 
 func (db *MockDbManager) AddFile(c *common.CartonFile) error {
 	return nil
+}
+
+func (db *MockDbManager) GetFileByName(name string) (
+	*common.CartonFile,
+	error,
+) {
+	return nil, nil
 }

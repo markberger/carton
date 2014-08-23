@@ -9,5 +9,6 @@ type DbManager interface {
 	RegisterUser(user string, hash []byte) error
 	GetPwdHash(user string) []byte
 	AddFile(c *common.CartonFile) error
+	GetFileByName(name string) (*common.CartonFile, error)
 	Close() error
 }

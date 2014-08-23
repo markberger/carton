@@ -94,4 +94,12 @@ func TestAddFile(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error adding file: %v", err)
 	}
+
+	f, err := m.GetFileByName("file name")
+	if err != nil {
+		t.Errorf("Error getting file: %v", err)
+	}
+	if f.Name != c.Name {
+		t.Error("File names don't match.")
+	}
 }

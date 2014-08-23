@@ -77,3 +77,24 @@ func (m *BoltManager) AddFile(c *common.CartonFile) error {
 	})
 	return err
 }
+
+func (m *BoltManager) GetFileByName(name string) (
+	*common.CartonFile,
+	error,
+) {
+	c := &common.CartonFile{}
+	err := m.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("files"))
+		v := b.Get([]byte(name))
+		if v == nil {
+			c = nil
+		} else {
+			err := c.GobDecode(v)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return c, err
+}
