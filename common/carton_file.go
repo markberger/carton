@@ -3,6 +3,7 @@ package common
 import (
 	"bytes"
 	"encoding/gob"
+	"encoding/json"
 )
 
 type CartonFile struct {
@@ -60,4 +61,18 @@ func (c *CartonFile) GobDecode(buf []byte) error {
 	}
 	return decoder.Decode(&c.Owner)
 
+}
+
+func (c *CartonFile) MarshalJSON() ([]byte, error) {
+	attributes := map[string]string{
+		"name":  c.Name,
+		"hash":  c.Md5Hash,
+		"owner": c.Owner,
+	}
+
+	b, err := json.Marshal(attributes)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }

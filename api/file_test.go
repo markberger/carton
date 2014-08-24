@@ -24,7 +24,7 @@ func TestFileUpload(t *testing.T) {
 
 	// Check GET request returns 404
 	w := test("GET", url.Values{})
-	if w.Code != http.StatusNotFound {
+	if w.Code != http.StatusUnauthorized {
 		t.Errorf(
 			"GET request returned %v. Expected %v",
 			w.Code,

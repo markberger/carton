@@ -1,7 +1,9 @@
 package api
 
 import (
+	"bytes"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/markberger/carton/common"
@@ -21,14 +23,28 @@ func fileHandler(
 	dest string,
 ) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
-			// Check client has permission to upload a file
-			session, _ := jar.Get(r, "carton-session")
-			if _, ok := session.Values["user"]; !ok {
-				http.Error(w, "No user logged in", http.StatusUnauthorized)
-				return
+		// Check client has permission to upload a file
+		session, _ := jar.Get(r, "carton-session")
+		if _, ok := session.Values["user"]; !ok {
+			http.Error(w, "No user logged in", http.StatusUnauthorized)
+			return
+		}
+
+		if r.Method == "GET" {
+			files, err := db.GetAllFiles()
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 
+			b, err := json.Marshal(files)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+
+			var out bytes.Buffer
+			json.Indent(&out, b, "", "\t")
+			out.WriteTo(w)
+		} else if r.Method == "POST" {
 			reader, err := r.MultipartReader()
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
