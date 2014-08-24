@@ -98,3 +98,26 @@ func (m *BoltManager) GetFileByName(name string) (
 	})
 	return c, err
 }
+
+func (m *BoltManager) GetAllFiles() ([]*common.CartonFile, error) {
+	files := []*common.CartonFile{}
+	err := m.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("files"))
+		cur := b.Cursor()
+
+		for k, v := cur.First(); k != nil; k, v = cur.Next() {
+			c := &common.CartonFile{}
+			err := c.GobDecode(v)
+			if err != nil {
+				return err
+			}
+			files = append(files, c)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return files, nil
+}

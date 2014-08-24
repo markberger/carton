@@ -102,4 +102,43 @@ func TestAddFile(t *testing.T) {
 	if f.Name != c.Name {
 		t.Error("File names don't match.")
 	}
+
+	m.Close()
+	os.Remove(tempDb)
+}
+
+func TestGetAllFiles(t *testing.T) {
+	tempDb := getTempDb()
+	if tempDb == "" {
+		t.Skip("Cannot create temp file")
+	}
+
+	m, _ := NewBoltManager(tempDb)
+	c1 := &common.CartonFile{
+		"test file 1",
+		"md5 hash",
+		"/fake/path",
+		[]byte("file pass"),
+		"owner",
+	}
+	c2 := &common.CartonFile{
+		"test file 2",
+		"md5 hash",
+		"/fake/path",
+		[]byte("file pass"),
+		"owner",
+	}
+	m.AddFile(c1)
+	m.AddFile(c2)
+
+	files, err := m.GetAllFiles()
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	if len(files) != 2 {
+		t.Errorf("Expected 2 files. Recieved %v", len(files))
+	}
+
+	m.Close()
+	os.Remove(tempDb)
 }

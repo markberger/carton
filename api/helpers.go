@@ -164,3 +164,11 @@ func (db *MockDbManager) GetFileByName(name string) (
 		return db.files[name], nil
 	}
 }
+
+func (db *MockDbManager) GetAllFiles() ([]*common.CartonFile, error) {
+	files := []*common.CartonFile{}
+	for _, v := range db.files {
+		files = append(files, v)
+	}
+	return files, nil
+}
