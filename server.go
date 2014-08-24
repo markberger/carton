@@ -6,6 +6,7 @@ import (
 	"github.com/markberger/carton/api"
 	"github.com/markberger/carton/db"
 	"net/http"
+	"os"
 )
 
 // Maps files in path to be served at the given url
@@ -28,7 +29,8 @@ func registerVendor() {
 func main() {
 	b, _ := db.NewBoltManager("./bolt.db")
 	jar := sessions.NewCookieStore([]byte("secret key"))
-	api.RegisterHandlers(b, jar)
+	os.Mkdir("./carton_files", os.ModeDir|0666)
+	api.RegisterHandlers(b, jar, "./carton_files")
 	registerVendor()
 
 	// ClearHandler is for gorilla/sessions. There will be a

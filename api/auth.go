@@ -126,8 +126,9 @@ func logoutHandler(jar *sessions.CookieStore) http.Handler {
 	})
 }
 
-func RegisterHandlers(db db.DbManager, jar *sessions.CookieStore) {
+func RegisterHandlers(db db.DbManager, jar *sessions.CookieStore, dest string) {
 	http.Handle("/api/login", loginHandler(db, jar))
 	http.Handle("/api/register", registerHandler(db, jar))
 	http.Handle("/api/logout", logoutHandler(jar))
+	http.Handle("/api/file", fileHandler(db, jar, dest))
 }

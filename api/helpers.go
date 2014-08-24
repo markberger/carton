@@ -1,11 +1,16 @@
 package api
 
 import (
+	"bytes"
 	"errors"
 	"github.com/markberger/carton/common"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -62,15 +67,55 @@ func GenerateHandleTester(
 	}
 }
 
+// From Matt Aimonetti's blog post:
+// matt.aimonetti.net/posts/2013/07/01/golang-multipart-file-upload-example/
+// Creates a new file upload http request with optional extra params
+func newFileUploadRequest(
+	paramName string,
+	path string,
+	params map[string]string,
+) (*http.Request, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(paramName, filepath.Base(path))
+	if err != nil {
+		return nil, err
+	}
+	_, err = io.Copy(part, file)
+
+	for key, val := range params {
+		_ = writer.WriteField(key, val)
+	}
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", "", body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", writer.FormDataContentType())
+	return req, nil
+}
+
 type MockDbManager struct {
 	registrationError bool
 	users             map[string][]byte
+	files             map[string]*common.CartonFile
 }
 
 func NewMockDbManager(registrationError bool) *MockDbManager {
 	db := MockDbManager{}
 	db.registrationError = registrationError
 	db.users = make(map[string][]byte)
+	db.files = make(map[string]*common.CartonFile)
 	return &db
 }
 
@@ -101,12 +146,21 @@ func (db *MockDbManager) GetPwdHash(user string) []byte {
 }
 
 func (db *MockDbManager) AddFile(c *common.CartonFile) error {
-	return nil
+	if _, ok := db.files[c.Name]; ok {
+		return errors.New("File already exists")
+	} else {
+		db.files[c.Name] = c
+		return nil
+	}
 }
 
 func (db *MockDbManager) GetFileByName(name string) (
 	*common.CartonFile,
 	error,
 ) {
-	return nil, nil
+	if _, ok := db.files[name]; !ok {
+		return nil, errors.New("File does not exist")
+	} else {
+		return db.files[name], nil
+	}
 }
