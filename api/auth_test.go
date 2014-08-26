@@ -198,3 +198,38 @@ func TestRegisterHandle(t *testing.T) {
 		t.Error("test user was not added to the database.")
 	}
 }
+
+func TestStatusHandle(t *testing.T) {
+	jar := sessions.NewCookieStore([]byte("secret key"))
+	statusHandle := statusHandler(jar)
+	test := GenerateHandleTester(t, statusHandle)
+
+	// Check that status failed without a user logged in
+	w := test("GET", url.Values{})
+	if w.Code != http.StatusForbidden {
+		t.Errorf(
+			"GET /status returned %v. Expected %v",
+			w.Code,
+			http.StatusForbidden,
+		)
+	}
+
+	// Check succeeds when a user is logged in
+	req, err := http.NewRequest("GET", "", nil)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	w = httptest.NewRecorder()
+	session, _ := jar.Get(req, "carton-session")
+	session.Values["user"] = "test user"
+	session.Save(req, w)
+	statusHandle.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf(
+			"GET /status with user returned %v. Expected %v",
+			w.Code,
+			http.StatusOK,
+		)
+	}
+}

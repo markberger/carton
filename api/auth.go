@@ -126,9 +126,27 @@ func logoutHandler(jar *sessions.CookieStore) http.Handler {
 	})
 }
 
+func statusHandler(jar *sessions.CookieStore) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			session, _ := jar.Get(r, "carton-session")
+			if _, ok := session.Values["user"]; ok {
+				w.WriteHeader(200)
+				fmt.Fprintln(w, "User is logged in")
+				http.Error(w, "No user is signed in", http.StatusForbidden)
+			} else {
+				http.Error(w, "No user is signed in", http.StatusForbidden)
+			}
+		} else {
+			return404(w)
+		}
+	})
+}
+
 func RegisterHandlers(db db.DbManager, jar *sessions.CookieStore, dest string) {
 	http.Handle("/api/login", loginHandler(db, jar))
 	http.Handle("/api/register", registerHandler(db, jar))
 	http.Handle("/api/logout", logoutHandler(jar))
+	http.Handle("/api/status", statusHandler(jar))
 	http.Handle("/api/files", fileHandler(db, jar, dest))
 }
