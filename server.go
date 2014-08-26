@@ -11,7 +11,7 @@ import (
 
 // Maps files in path to be served at the given url
 
-func registerDir(url string, path string) {
+func serveDir(url string, path string) {
 	http.Handle(
 		url,
 		http.StripPrefix(
@@ -21,9 +21,17 @@ func registerDir(url string, path string) {
 	)
 }
 
+func serveFile(url string, path string) {
+	http.HandleFunc(url, func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, path)
+	})
+}
+
 func registerVendor() {
-	registerDir("/static/bootstrap/", "./vendor/bootstrap-3.2.0/")
-	registerDir("/static/dropzone/", "./vendor/dropzone-3.10.2/")
+	serveDir("/static/bootstrap/", "./vendor/bootstrap-3.2.0/")
+	serveDir("/static/dropzone/", "./vendor/dropzone-3.10.2/")
+	serveDir("/static/angular/", "./vendor/angular/")
+	serveDir("/", "./public/")
 }
 
 func main() {
