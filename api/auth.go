@@ -144,9 +144,9 @@ func statusHandler(jar *sessions.CookieStore) http.Handler {
 }
 
 func RegisterHandlers(db db.DbManager, jar *sessions.CookieStore, dest string) {
-	http.Handle("/api/login", loginHandler(db, jar))
-	http.Handle("/api/register", registerHandler(db, jar))
-	http.Handle("/api/logout", logoutHandler(jar))
-	http.Handle("/api/status", statusHandler(jar))
+	http.Handle("/api/auth/login", loginHandler(db, jar))
+	http.Handle("/api/auth/register", registerHandler(db, jar))
+	http.Handle("/api/auth/logout", logoutHandler(jar))
+	http.Handle("/api/auth/status", statusHandler(jar))
 	http.Handle("/api/files", fileHandler(db, jar, dest))
 }
