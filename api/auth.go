@@ -71,6 +71,7 @@ func registerHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 				pass2 == "" ||
 				pass1 != pass2 {
 				http.Error(w, "bad arguments", http.StatusBadRequest)
+				return
 			}
 
 			if db.IsUser(username) {
