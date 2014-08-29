@@ -3,12 +3,26 @@
 (function() {
     'use strict';
     angular.module('carton.services', [])
-        .service('UserService', [function() {
-            var sdo = {
-                isLogged: false,
-                username: ''
-            };
+        .service('UserService', ['$http',
+			function($http) {
 
-            return sdo;
+				var sdo = {
+					isLogged: false
+				}
+
+				$http({method: 'GET', url: '/api/auth/status'})
+
+				.success(function(data, status, headers, config) {
+					if (data.status) {
+						sdo.isLogged = true;
+							return sdo;
+					} else {
+						return sdo;
+					}
+				})
+
+				.error(function(data, status, headers, config) {
+					return sdo;
+				});
         }]);
 })();

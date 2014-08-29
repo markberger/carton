@@ -29,7 +29,7 @@
             state('login', {
                 url: '/login',
                 templateUrl: 'partials/login.html',
-                controller: 'loginCtrl',
+                controller: 'LoginCtrl',
                 data: {
                     access: {
                         isFree: true
@@ -40,7 +40,7 @@
             state('register', {
                 url: '/register',
                 templateUrl: 'partials/register.html',
-                //controller: 'RegisterCtrl'
+                controller: 'RegisterCtrl',
                 data: {
                     access: {
                         isFree: true
