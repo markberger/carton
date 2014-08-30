@@ -37,7 +37,7 @@ func registerVendor() {
 func main() {
 	b, _ := db.NewBoltManager("./bolt.db")
 	jar := sessions.NewCookieStore([]byte("secret key"))
-	os.Mkdir("./carton_files", os.ModeDir|0666)
+	os.Mkdir("./carton_files", os.ModeDir|0764)
 	api.RegisterHandlers(b, jar, "./carton_files")
 	registerVendor()
 
