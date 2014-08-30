@@ -2,9 +2,43 @@ h1 {
     text-align: center;
 }
 
+.filesMain a.ng-scope, a:visited, a:hover, a:active {
+  color: #428bca;
+}
+
 .filesDraggedOver {
 	border-style: solid;
 	border-color: #76EE76;
 	opacity: 0.9;
 	height: 100%;
+}
+
+.glyphicon-remove-circle {
+	color: #d9534f;
+}
+
+.glyphicon-link {
+	color: #9C9C9C;
+}
+
+.glyphicon-cloud-download {
+	color: black;
+}
+
+.fileSelected {
+	background-color: #EBEBEB;
+}
+
+.action-bar a {
+	padding-right: 5px;
+	padding-left: 5px;
+}
+
+.action-bar a:hover {
+	text-decoration: none;
+}
+
+.action-bar .file-name {
+	text-decoration: none;
+	color: black;
 }

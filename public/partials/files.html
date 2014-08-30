@@ -1,4 +1,11 @@
-<div ng-file-drop="onFileSelect($files)">
+<div class="action-bar" ng-show="selected !== null">
+  <a class="file-name">{{selected.name}}</a>
+  <a>Share link <span class="glyphicon glyphicon-link"></span></a>
+  <a>Download <span class="glyphicon glyphicon-cloud-download"></spain></a>
+  <a>Delete <span class="glyphicon glyphicon-remove-circle"></span><a>
+</div>
+
+<div class="filesMain" ng-file-drop="onFileSelect($files)">
   <div ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="filesDraggedOver"
         ng-show="dropSupported">
     <table class="table">
@@ -6,7 +13,7 @@
         <th>Name</th>
       </thead>
       <tbody>
-        <tr ng-repeat="file in getFiles()">
+        <tr ng-repeat="file in getFiles()" ng-click="setSelected(file)" ng-class="{fileSelected: selected === file}">
           <td>{{file.name}}</td>
         </tr>
       </tbody>

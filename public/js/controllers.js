@@ -63,6 +63,7 @@
             ) {
 
                 var filesCtrl = this;
+                $scope.selected = null;
 
                 $scope.onFileSelect = function($files) {
                     for (var i = 0; i < $files.length; i++) {
@@ -80,6 +81,14 @@
                         }).error(function(data, status, headers, config) {
                             console.log(data);
                         });
+                    }
+                }
+
+                $scope.setSelected = function(file) {
+                    if ($scope.selected === file) {
+                        $scope.selected = null;
+                    } else {
+                        $scope.selected = file;
                     }
                 }
 
