@@ -3,6 +3,7 @@
 
     angular.module('carton', [
         'ui.router',
+        'angularFileUpload',
         'carton.controllers',
         'carton.services'
     ]).
@@ -18,7 +19,7 @@
             state('files', {
                 url: '/',
                 templateUrl: 'partials/files.html',
-                //controller: 'FilesCtrl'
+                controller: 'FilesCtrl',
                 data: {
                     access: {
                         isFree: false

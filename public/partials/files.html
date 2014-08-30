@@ -1,3 +1,9 @@
-<div>
-    <p>ALL THE FILES</p>
+<div ng-file-drop="onFileSelect($files)">
+  <div ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="filesDraggedOver"
+        ng-show="dropSupported">
+    <p>drop files here</p>
+  </div>
+  <div ng-file-drop-available="dropSupported=true" ng-show="!dropSupported">
+    <p>HTML5 Drop File is not supported!</p>
+  </div>
 </div>
