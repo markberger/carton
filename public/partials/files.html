@@ -1,7 +1,16 @@
 <div ng-file-drop="onFileSelect($files)">
   <div ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="filesDraggedOver"
         ng-show="dropSupported">
-    <p>drop files here</p>
+    <table class="table">
+      <thead>
+        <th>Name</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="file in getFiles()">
+          <td>{{file.name}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <div ng-file-drop-available="dropSupported=true" ng-show="!dropSupported">
     <p>HTML5 Drop File is not supported!</p>

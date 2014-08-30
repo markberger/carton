@@ -54,11 +54,16 @@
         ])
 
         .controller('FilesCtrl', ['$scope',
+            '$http',
             '$upload',
             function(
                 $scope,
+                $http,
                 $upload
             ) {
+
+                var filesCtrl = this;
+
                 $scope.onFileSelect = function($files) {
                     for (var i = 0; i < $files.length; i++) {
                         var file = $files[i];
@@ -71,11 +76,30 @@
                         }).success(function(data, status, headers, config) {
                             // file is uploaded successfully
                             console.log(data);
+                            $scope.apiGetFiles();
                         }).error(function(data, status, headers, config) {
                             console.log(data);
                         });
                     }
                 }
+
+                $scope.apiGetFiles = function() {
+                    $http.get('/api/files')
+
+                    .success(function(data, status, headers, config) {
+                        filesCtrl.files = data;
+                    })
+
+                    .error(function(data, status, headers, config) {
+                        filesCtrl.files = {};
+                    })
+                }
+
+                $scope.getFiles = function() {
+                    return filesCtrl.files;
+                };
+
+                $scope.apiGetFiles();
             }
         ])
 
