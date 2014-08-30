@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/go.crypto/bcrypt"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/markberger/carton/db"
 	"net/http"
@@ -165,10 +166,15 @@ func statusHandler(jar *sessions.CookieStore) http.Handler {
 	})
 }
 
-func RegisterHandlers(db db.DbManager, jar *sessions.CookieStore, dest string) {
-	http.Handle("/api/auth/login", loginHandler(db, jar))
-	http.Handle("/api/auth/register", registerHandler(db, jar))
-	http.Handle("/api/auth/logout", logoutHandler(jar))
-	http.Handle("/api/auth/status", statusHandler(jar))
-	http.Handle("/api/files", fileHandler(db, jar, dest))
+func RegisterHandlers(
+	m *mux.Router,
+	db db.DbManager,
+	jar *sessions.CookieStore,
+	dest string,
+) {
+	m.Handle("/api/auth/login", loginHandler(db, jar))
+	m.Handle("/api/auth/register", registerHandler(db, jar))
+	m.Handle("/api/auth/logout", logoutHandler(jar))
+	m.Handle("/api/auth/status", statusHandler(jar))
+	m.Handle("/api/files", fileHandler(db, jar, dest))
 }

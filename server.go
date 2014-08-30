@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gorilla/context"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/markberger/carton/api"
 	"github.com/markberger/carton/db"
@@ -11,9 +12,8 @@ import (
 
 // Maps files in path to be served at the given url
 
-func serveDir(url string, path string) {
-	http.Handle(
-		url,
+func serveDir(m *mux.Router, url string, path string) {
+	m.PathPrefix(url).Handler(
 		http.StripPrefix(
 			url,
 			http.FileServer(http.Dir(path)),
@@ -27,19 +27,21 @@ func serveFile(url string, path string) {
 	})
 }
 
-func registerVendor() {
-	serveDir("/static/bootstrap/", "./vendor/bootstrap-3.2.0/")
-	serveDir("/static/dropzone/", "./vendor/dropzone-3.10.2/")
-	serveDir("/static/angular/", "./vendor/angular/")
-	serveDir("/", "./public/")
+func registerVendor(m *mux.Router) {
+	serveDir(m, "/static/bootstrap/", "./vendor/bootstrap-3.2.0/")
+	serveDir(m, "/static/dropzone/", "./vendor/dropzone-3.10.2/")
+	serveDir(m, "/static/angular/", "./vendor/angular/")
+	serveDir(m, "/", "./public/")
 }
 
 func main() {
 	b, _ := db.NewBoltManager("./bolt.db")
+	m := mux.NewRouter()
 	jar := sessions.NewCookieStore([]byte("secret key"))
 	os.Mkdir("./carton_files", os.ModeDir|0764)
-	api.RegisterHandlers(b, jar, "./carton_files")
-	registerVendor()
+	api.RegisterHandlers(m, b, jar, "./carton_files")
+	registerVendor(m)
+	http.Handle("/", m)
 
 	// ClearHandler is for gorilla/sessions. There will be a
 	// memory leak without it
