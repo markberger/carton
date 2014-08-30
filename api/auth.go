@@ -2,11 +2,17 @@ package api
 
 import (
 	"code.google.com/p/go.crypto/bcrypt"
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/markberger/carton/db"
 	"net/http"
 )
+
+type User struct {
+	Username string
+	Password string
+}
 
 func loginHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -17,15 +23,20 @@ func loginHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 				return
 			}
 
-			username := r.PostFormValue("user")
-			password := r.PostFormValue("pass")
+			decoder := json.NewDecoder(r.Body)
+			var user User
+			err := decoder.Decode(&user)
+			if err != nil {
+				http.Error(w, "error decoding json", http.StatusBadRequest)
+				return
+			}
 
-			if username == "" || password == "" {
+			if user.Username == "" || user.Password == "" {
 				http.Error(w, "bad arguments", http.StatusBadRequest)
 				return
 			}
 
-			dbHash := db.GetPwdHash(username)
+			dbHash := db.GetPwdHash(user.Username)
 			if dbHash == nil {
 				http.Error(
 					w,
@@ -35,7 +46,7 @@ func loginHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 				return
 			}
 
-			err := bcrypt.CompareHashAndPassword(dbHash, []byte(password))
+			err = bcrypt.CompareHashAndPassword(dbHash, []byte(user.Password))
 			if err != nil {
 				http.Error(
 					w,
@@ -44,14 +55,20 @@ func loginHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 				)
 				return
 			}
-			session.Values["user"] = username
+			session.Values["user"] = user.Username
 			session.Save(r, w)
+			// Sets return code to 200
 			fmt.Fprintln(w, "login succeeded")
-			w.WriteHeader(http.StatusOK)
 		} else {
 			return404(w)
 		}
 	})
+}
+
+type NewUser struct {
+	Username  string
+	Password1 string
+	Password2 string
 }
 
 func registerHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
@@ -62,24 +79,29 @@ func registerHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 				http.Error(w, "already signed in", http.StatusBadRequest)
 				return
 			}
-			username := r.FormValue("user")
-			pass1 := r.FormValue("pass1")
-			pass2 := r.FormValue("pass2")
 
-			if username == "" ||
-				pass1 == "" ||
-				pass2 == "" ||
-				pass1 != pass2 {
+			decoder := json.NewDecoder(r.Body)
+			var user NewUser
+			err := decoder.Decode(&user)
+			if err != nil {
+				http.Error(w, "error decoding json", http.StatusBadRequest)
+				return
+			}
+
+			if user.Username == "" ||
+				user.Password1 == "" ||
+				user.Password2 == "" ||
+				user.Password1 != user.Password2 {
 				http.Error(w, "bad arguments", http.StatusBadRequest)
 				return
 			}
 
-			if db.IsUser(username) {
+			if db.IsUser(user.Username) {
 				http.Error(w, "user already exists", http.StatusBadRequest)
 				return
 			}
 
-			bytePass := []byte(pass1)
+			bytePass := []byte(user.Password1)
 			hash, err := bcrypt.GenerateFromPassword(bytePass, bcrypt.DefaultCost)
 			if err != nil {
 				http.Error(
@@ -90,7 +112,7 @@ func registerHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 				return
 			}
 
-			err = db.RegisterUser(username, hash)
+			err = db.RegisterUser(user.Username, hash)
 			if err != nil {
 				http.Error(
 					w,
@@ -99,10 +121,10 @@ func registerHandler(db db.DbManager, jar *sessions.CookieStore) http.Handler {
 				)
 				return
 			}
-			session.Values["user"] = username
+			session.Values["user"] = user.Username
 			session.Save(r, w)
 			w.WriteHeader(http.StatusCreated)
-			fmt.Fprintf(w, "Successfully registered %v", username)
+			fmt.Fprintf(w, "Successfully registered %v", user.Username)
 		} else {
 			return404(w)
 		}
@@ -119,8 +141,8 @@ func logoutHandler(jar *sessions.CookieStore) http.Handler {
 			}
 			delete(session.Values, "user")
 			session.Save(r, w)
+			// Sets return code to 200
 			fmt.Fprintln(w, "Successfully logged out")
-			w.WriteHeader(http.StatusOK)
 		} else {
 			return404(w)
 		}
@@ -132,9 +154,8 @@ func statusHandler(jar *sessions.CookieStore) http.Handler {
 		if r.Method == "GET" {
 			session, _ := jar.Get(r, "carton-session")
 			if _, ok := session.Values["user"]; ok {
-				w.WriteHeader(200)
+				// Sets return code to 200
 				fmt.Fprintln(w, "User is logged in")
-				http.Error(w, "No user is signed in", http.StatusForbidden)
 			} else {
 				http.Error(w, "No user is signed in", http.StatusForbidden)
 			}

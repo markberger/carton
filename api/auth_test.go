@@ -5,7 +5,6 @@ import (
 	"github.com/gorilla/sessions"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 )
 
@@ -16,7 +15,7 @@ func TestLoginHandler(t *testing.T) {
 	test := GenerateHandleTester(t, loginHandle)
 
 	// Test GET request
-	w := test("GET", url.Values{})
+	w := test("GET", "")
 	if w.Code != http.StatusNotFound {
 		t.Errorf(
 			"GET /login returned %v. Expected %v",
@@ -25,19 +24,15 @@ func TestLoginHandler(t *testing.T) {
 		)
 	}
 
+	goodParams := `{"username":"test user", "password":"test pass"}`
+
 	// Test possible combinations of bad inputs
-	badParams := [...]url.Values{
-		url.Values{},
-		url.Values{
-			"user": []string{"test user"},
-		},
-		url.Values{
-			"pass": []string{"test pass"},
-		},
-		url.Values{
-			"user": []string{"test user"},
-			"pass": []string{"test pass"},
-		},
+	badParams := [...]string{
+		`{}`,
+		`{"username":"test user"}`,
+		`{"password":"test pass"}`,
+		// Should fail because not in database
+		goodParams,
 	}
 
 	for _, params := range badParams {
@@ -57,10 +52,6 @@ func TestLoginHandler(t *testing.T) {
 		bcrypt.DefaultCost,
 	)
 	mockDb.RegisterUser("test user", hash)
-	goodParams := url.Values{
-		"user": []string{"test user"},
-		"pass": []string{"test pass"},
-	}
 
 	w = test("POST", goodParams)
 	if w.Code != http.StatusOK {
@@ -79,7 +70,7 @@ func TestLogoutHandler(t *testing.T) {
 
 	// Test logout without a logged in user is registered
 	// as a bad request.
-	w := test("POST", url.Values{})
+	w := test("POST", "")
 	if w.Code != http.StatusBadRequest {
 		t.Errorf(
 			"POST /logout: without user returned %v. Expected %v.",
@@ -116,7 +107,7 @@ func TestRegisterHandle(t *testing.T) {
 	test := GenerateHandleTester(t, registerHandle)
 
 	// Test GET request
-	w := test("GET", url.Values{})
+	w := test("GET", "")
 	if w.Code != http.StatusNotFound {
 		t.Errorf(
 			"GET /register returned %v. Expected %v",
@@ -125,22 +116,17 @@ func TestRegisterHandle(t *testing.T) {
 		)
 	}
 
-	goodParams := url.Values{
-		"user":  []string{"test user"},
-		"pass1": []string{"test pass"},
-		"pass2": []string{"test pass"},
-	}
+	goodParams := `{
+		"username": "test user",
+		"password1": "test pass",
+		"password2": "test pass"
+	}`
 
 	// Test bad inputs and possible registration error
-	badParams := [...]url.Values{
-		url.Values{},
-		url.Values{
-			"user": []string{"test user"},
-		},
-		url.Values{
-			"pass1": []string{"test pass"},
-			"pass2": []string{"test pass"},
-		},
+	badParams := [...]string{
+		`{}`,
+		`{"username": "test user"}`,
+		`{"password1": "test pass", "password2": "test pass"}`,
 		// This should fail because we created a mockDb that will
 		// throw an error when attempting to register a new user.
 		goodParams,
@@ -205,7 +191,7 @@ func TestStatusHandle(t *testing.T) {
 	test := GenerateHandleTester(t, statusHandle)
 
 	// Check that status failed without a user logged in
-	w := test("GET", url.Values{})
+	w := test("GET", "")
 	if w.Code != http.StatusForbidden {
 		t.Errorf(
 			"GET /status returned %v. Expected %v",

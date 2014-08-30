@@ -8,7 +8,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,7 +28,7 @@ func return404(w http.ResponseWriter) {
 
 type HandleTester func(
 	method string,
-	params url.Values,
+	params string,
 ) *httptest.ResponseRecorder
 
 // Given the current test runner and an http.Handler, generate a
@@ -46,21 +45,22 @@ func GenerateHandleTester(
 
 	return func(
 		method string,
-		params url.Values,
+		params string,
 	) *httptest.ResponseRecorder {
 
 		req, err := http.NewRequest(
 			method,
 			"",
-			strings.NewReader(params.Encode()),
+			strings.NewReader(params),
 		)
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 		req.Header.Set(
 			"Content-Type",
-			"application/x-www-form-urlencoded; param=value",
+			"application/json",
 		)
+		req.Body.Close()
 		w := httptest.NewRecorder()
 		handleFunc.ServeHTTP(w, req)
 		return w

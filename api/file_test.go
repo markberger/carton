@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
@@ -23,7 +22,7 @@ func TestFileUpload(t *testing.T) {
 	test := GenerateHandleTester(t, uploadHandle)
 
 	// Check GET request returns 404
-	w := test("GET", url.Values{})
+	w := test("GET", "")
 	if w.Code != http.StatusUnauthorized {
 		t.Errorf(
 			"GET request returned %v. Expected %v",
@@ -33,7 +32,7 @@ func TestFileUpload(t *testing.T) {
 	}
 
 	// Check that someone can't upload a file if they're not logged in
-	w = test("POST", url.Values{})
+	w = test("POST", "")
 	if w.Code != http.StatusUnauthorized {
 		t.Errorf(
 			"POST request returned %v. Expected %v",
