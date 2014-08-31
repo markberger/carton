@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gorilla/sessions"
+	"github.com/markberger/carton/db"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestFileUpload(t *testing.T) {
-	mockDb := NewMockDbManager(false)
+	mockDb := db.NewMockDbManager(false)
 	jar := sessions.NewCookieStore([]byte("secret key"))
 	tmpDirPath := os.TempDir()
 	tmpUploadsPath, err := ioutil.TempDir(tmpDirPath, "cartonUploadTest")

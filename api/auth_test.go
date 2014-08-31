@@ -3,13 +3,14 @@ package api
 import (
 	"code.google.com/p/go.crypto/bcrypt"
 	"github.com/gorilla/sessions"
+	"github.com/markberger/carton/db"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestLoginHandler(t *testing.T) {
-	mockDb := NewMockDbManager(false)
+	mockDb := db.NewMockDbManager(false)
 	jar := sessions.NewCookieStore([]byte("secret key"))
 	loginHandle := loginHandler(mockDb, jar)
 	test := GenerateHandleTester(t, loginHandle)
@@ -101,7 +102,7 @@ func TestLogoutHandler(t *testing.T) {
 }
 
 func TestRegisterHandle(t *testing.T) {
-	mockDb := NewMockDbManager(true)
+	mockDb := db.NewMockDbManager(true)
 	jar := sessions.NewCookieStore([]byte("secret key"))
 	registerHandle := registerHandler(mockDb, jar)
 	test := GenerateHandleTester(t, registerHandle)
@@ -169,7 +170,7 @@ func TestRegisterHandle(t *testing.T) {
 	}
 
 	// Test that user is successfully registered
-	mockDb = NewMockDbManager(false)
+	mockDb = db.NewMockDbManager(false)
 	registerHandle = registerHandler(mockDb, jar)
 	test = GenerateHandleTester(t, registerHandle)
 	w = test("POST", goodParams)
