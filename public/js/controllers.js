@@ -120,6 +120,18 @@
                     })
                 }
 
+                $scope.showLink = function() {
+                    ngDialog.open({
+                        template: 'partials/getLink.html',
+                        className: 'ngdialog-theme-default',
+                        scope: $scope
+                    });
+                }
+
+                $scope.genLink = function(file) {
+                    return window.location.host + '/api/files/' + file.hash;
+                }
+
                 $scope.apiGetFiles = function() {
                     $http.get('/api/files')
 

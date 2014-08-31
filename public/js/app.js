@@ -6,7 +6,8 @@
         'angularFileUpload',
         'ngDialog',
         'carton.controllers',
-        'carton.services'
+        'carton.services',
+        'carton.directives'
     ]).
     config([
         '$stateProvider',

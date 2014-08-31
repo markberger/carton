@@ -1,6 +1,6 @@
 <div class="action-bar" ng-show="selected !== null">
   <a class="file-name">{{selected.name}}</a>
-  <a>Share link <span class="glyphicon glyphicon-link"></span></a>
+  <a ng-click="showLink()">Share link <span class="glyphicon glyphicon-link"></span></a>
   <a>Download <span class="glyphicon glyphicon-cloud-download"></spain></a>
   <a ng-click="deleteSelected()">Delete <span class="glyphicon glyphicon-remove-circle"></span><a>
 </div>
