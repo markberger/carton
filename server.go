@@ -29,8 +29,8 @@ func serveFile(url string, path string) {
 
 func registerVendor(m *mux.Router) {
 	serveDir(m, "/static/bootstrap/", "./vendor/bootstrap-3.2.0/")
-	serveDir(m, "/static/dropzone/", "./vendor/dropzone-3.10.2/")
 	serveDir(m, "/static/angular/", "./vendor/angular/")
+	serveDir(m, "/static/ngDialog/", "./vendor/ngDialog/")
 	serveDir(m, "/", "./public/")
 }
 

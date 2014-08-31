@@ -4,6 +4,7 @@
     angular.module('carton', [
         'ui.router',
         'angularFileUpload',
+        'ngDialog',
         'carton.controllers',
         'carton.services'
     ]).

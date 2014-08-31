@@ -56,10 +56,12 @@
         .controller('FilesCtrl', ['$scope',
             '$http',
             '$upload',
+            'ngDialog',
             function(
                 $scope,
                 $http,
-                $upload
+                $upload,
+                ngDialog
             ) {
 
                 var filesCtrl = this;
@@ -93,6 +95,18 @@
                 }
 
                 $scope.deleteSelected = function() {
+                    var q = ngDialog.openConfirm({
+                        template: 'partials/confirmDelete.html',
+                        className: 'ngdialog-theme-default',
+                        scope: $scope
+                    });
+
+                    q.then(function() {
+                        $scope._deleteSelected();
+                    })
+                }
+
+                $scope._deleteSelected = function() {
                     var hash = $scope.selected.hash;
                     $http.delete('/api/files/'+hash)
 
