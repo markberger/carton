@@ -66,9 +66,9 @@ func TestFileUpload(t *testing.T) {
 		)
 	}
 
-	c, err := mockDb.GetFileByName(filepath.Base(tmpFile.Name()))
-	if err != nil {
-		t.Error("Error retrieving uploaded file")
+	c := mockDb.GetFileByName(filepath.Base(tmpFile.Name()))
+	if c == nil {
+		t.Error("Could not find file")
 	}
 	switch {
 	case c.Name != tmpFile.Name():

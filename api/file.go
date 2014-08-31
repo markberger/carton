@@ -101,7 +101,12 @@ func fileHandler(
 func singleFileHandler(db db.DbManager) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		md5Hash := mux.Vars(r)["hash"]
-		c := db.GetFileByHash(md5Hash)
+		c, err := db.GetFileByHash(md5Hash)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintln(w, "error decoding file")
+			return
+		}
 		if c == nil {
 			return404(w)
 			return

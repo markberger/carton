@@ -10,7 +10,7 @@ type DbManager interface {
 	GetPwdHash(user string) []byte
 	AddFile(c *common.CartonFile) error
 	GetAllFiles() ([]*common.CartonFile, error)
-	GetFileByName(name string) (*common.CartonFile, error)
-	GetFileByHash(hash string) *common.CartonFile
+	GetFileByHash(name string) (*common.CartonFile, error)
+	GetFileByName(hash string) *common.CartonFile
 	Close() error
 }

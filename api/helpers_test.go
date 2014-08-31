@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"github.com/markberger/carton/common"
 	"testing"
 )
 
@@ -17,6 +18,26 @@ func TestMockDb(t *testing.T) {
 	hash := db.GetPwdHash("test user")
 	if !bytes.Equal(hash, []byte("test pass")) {
 		t.Error("Failed to store password in the mock db")
+	}
+	c := &common.CartonFile{
+		"test file 1",
+		"md5 hash",
+		"/fake/path",
+		[]byte("file pass"),
+		"owner",
+	}
+	db.AddFile(c)
+	c2, err := db.GetFileByHash("md5 hash")
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if c2 != c {
+		t.Error("Failed to get file by hash")
+	}
+
+	c2 = db.GetFileByName("test file 1")
+	if c2 != c {
+		t.Error("Failed to get file by name")
 	}
 
 	db = NewMockDbManager(true)

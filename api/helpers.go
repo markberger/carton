@@ -146,27 +146,32 @@ func (db *MockDbManager) GetPwdHash(user string) []byte {
 }
 
 func (db *MockDbManager) AddFile(c *common.CartonFile) error {
-	if _, ok := db.files[c.Name]; ok {
+	if _, ok := db.files[c.Md5Hash]; ok {
 		return errors.New("File already exists")
 	} else {
-		db.files[c.Name] = c
+		db.files[c.Md5Hash] = c
 		return nil
 	}
 }
 
-func (db *MockDbManager) GetFileByName(name string) (
+func (db *MockDbManager) GetFileByName(name string) *common.CartonFile {
+	for _, c := range db.files {
+		if c.Name == name {
+			return c
+		}
+	}
+	return nil
+}
+
+func (db *MockDbManager) GetFileByHash(hash string) (
 	*common.CartonFile,
 	error,
 ) {
-	if _, ok := db.files[name]; !ok {
+	if _, ok := db.files[hash]; !ok {
 		return nil, errors.New("File does not exist")
 	} else {
-		return db.files[name], nil
+		return db.files[hash], nil
 	}
-}
-
-func (db *MockDbManager) GetFileByHash(hash string) *common.CartonFile {
-	return nil
 }
 
 func (db *MockDbManager) GetAllFiles() ([]*common.CartonFile, error) {

@@ -95,15 +95,18 @@ func TestAddFile(t *testing.T) {
 		t.Errorf("Error adding file: %v", err)
 	}
 
-	f, err := m.GetFileByName("file name")
-	if err != nil {
-		t.Errorf("Error getting file: %v", err)
+	f := m.GetFileByName("file name")
+	if f == nil {
+		t.Error("Could not find file")
 	}
 	if f.Name != c.Name {
 		t.Error("File names don't match")
 	}
 
-	f = m.GetFileByHash("md5 hash")
+	f, err = m.GetFileByHash("md5 hash")
+	if err != nil {
+		t.Errorf("Error decoding file: %v", err)
+	}
 	if f.Name != c.Name {
 		t.Error("File names don't match")
 	}
@@ -128,9 +131,9 @@ func TestGetAllFiles(t *testing.T) {
 	}
 	c2 := &common.CartonFile{
 		"test file 2",
-		"md5 hash",
-		"/fake/path",
-		[]byte("file pass"),
+		"md5 hash 2",
+		"/fake/path 2",
+		[]byte("file pass 2"),
 		"owner",
 	}
 	m.AddFile(c1)
@@ -142,6 +145,10 @@ func TestGetAllFiles(t *testing.T) {
 	}
 	if len(files) != 2 {
 		t.Errorf("Expected 2 files. Recieved %v", len(files))
+	}
+
+	if files[0].Name == files[1].Name {
+		t.Error("Received same file twice")
 	}
 
 	m.Close()

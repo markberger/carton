@@ -72,20 +72,20 @@ func (m *BoltManager) AddFile(c *common.CartonFile) error {
 		if err != nil {
 			return err
 		}
-		err = b.Put([]byte(c.Name), file)
+		err = b.Put([]byte(c.Md5Hash), file)
 		return err
 	})
 	return err
 }
 
-func (m *BoltManager) GetFileByName(name string) (
+func (m *BoltManager) GetFileByHash(hash string) (
 	*common.CartonFile,
 	error,
 ) {
 	c := &common.CartonFile{}
 	err := m.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("files"))
-		v := b.Get([]byte(name))
+		v := b.Get([]byte(hash))
 		if v == nil {
 			c = nil
 		} else {
@@ -99,9 +99,7 @@ func (m *BoltManager) GetFileByName(name string) (
 	return c, err
 }
 
-// TODO: This should be an O(1) operation
-
-func (m *BoltManager) GetFileByHash(hash string) *common.CartonFile {
+func (m *BoltManager) GetFileByName(name string) *common.CartonFile {
 	c := &common.CartonFile{}
 	m.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("files"))
@@ -109,7 +107,7 @@ func (m *BoltManager) GetFileByHash(hash string) *common.CartonFile {
 
 		for k, v := cur.First(); k != nil; k, v = cur.Next() {
 			c.GobDecode(v)
-			if c.Md5Hash == hash {
+			if c.Name == name {
 				return nil
 			}
 		}
