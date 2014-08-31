@@ -92,6 +92,20 @@
                     }
                 }
 
+                $scope.deleteSelected = function() {
+                    var hash = $scope.selected.hash;
+                    $http.delete('/api/files/'+hash)
+
+                    .success(function(data, status, headers, config) {
+                        $scope.selected = null;
+                        $scope.apiGetFiles();
+                    })
+
+                    .error(function(data, status, headers, config) {
+                        console.log('failed to delete file');
+                    })
+                }
+
                 $scope.apiGetFiles = function() {
                     $http.get('/api/files')
 

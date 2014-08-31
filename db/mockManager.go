@@ -81,3 +81,12 @@ func (db *MockDbManager) GetAllFiles() ([]*common.CartonFile, error) {
 	}
 	return files, nil
 }
+
+func (db *MockDbManager) DeleteFile(hash string) error {
+	if _, ok := db.files[hash]; ok {
+		delete(db.files, hash)
+		return nil
+	} else {
+		return errors.New("No file with corresponding hash")
+	}
+}

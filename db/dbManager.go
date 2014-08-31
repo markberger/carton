@@ -12,5 +12,6 @@ type DbManager interface {
 	GetAllFiles() ([]*common.CartonFile, error)
 	GetFileByHash(name string) (*common.CartonFile, error)
 	GetFileByName(hash string) *common.CartonFile
+	DeleteFile(hash string) error
 	Close() error
 }

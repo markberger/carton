@@ -8,22 +8,10 @@ import (
 	"testing"
 )
 
-// Helper functions
-
-func getTempDb() string {
-	tmpDirPath := os.TempDir()
-	f, err := ioutil.TempFile(tmpDirPath, "carton_dbTest")
-	if err != nil {
-		return ""
-	}
-	f.Close()
-	return f.Name()
-}
-
 // BoltManager tests
 
 func TestNewBoltManager(t *testing.T) {
-	tempDb := getTempDb()
+	tempDb := getTempFile()
 	if tempDb == "" {
 		t.Skip("Cannot create temp file")
 	}
@@ -50,8 +38,8 @@ func TestNewBoltManager(t *testing.T) {
 	os.Remove(tempDb)
 }
 
-func TestUserRegistration(t *testing.T) {
-	tempDb := getTempDb()
+func TestAddUser(t *testing.T) {
+	tempDb := getTempFile()
 	if tempDb == "" {
 		t.Skip("Cannot create temp file")
 	}
@@ -75,8 +63,8 @@ func TestUserRegistration(t *testing.T) {
 	os.Remove(tempDb)
 }
 
-func TestAddFile(t *testing.T) {
-	tempDb := getTempDb()
+func TestAddAndGet(t *testing.T) {
+	tempDb := getTempFile()
 	if tempDb == "" {
 		t.Skip("Cannot create temp file")
 	}
@@ -115,8 +103,41 @@ func TestAddFile(t *testing.T) {
 	os.Remove(tempDb)
 }
 
+func TestDelete(t *testing.T) {
+	tempDb := getTempFile()
+	if tempDb == "" {
+		t.Skip("Cannot create temp file")
+	}
+
+	m, _ := NewBoltManager(tempDb)
+	tempFile := getTempFile()
+	c := &common.CartonFile{
+		"test file 1",
+		"md5 hash",
+		tempFile,
+		[]byte("file pass"),
+		"owner",
+	}
+	m.AddFile(c)
+
+	err := m.DeleteFile("md5 hash")
+	if err != nil {
+		t.Errorf("Error deleting file: %v", err)
+	}
+	if fileExists(tempFile) {
+		t.Error("Failed to delete file")
+	}
+	files, _ := m.GetAllFiles()
+	if len(files) != 0 {
+		t.Error("Failed to delete db entry")
+	}
+
+	m.Close()
+	os.Remove(tempDb)
+}
+
 func TestGetAllFiles(t *testing.T) {
-	tempDb := getTempDb()
+	tempDb := getTempFile()
 	if tempDb == "" {
 		t.Skip("Cannot create temp file")
 	}
@@ -153,4 +174,23 @@ func TestGetAllFiles(t *testing.T) {
 
 	m.Close()
 	os.Remove(tempDb)
+}
+
+// Helper functions
+
+func fileExists(path string) bool {
+	if _, err := os.Stat(path); err == nil {
+		return true
+	}
+	return false
+}
+
+func getTempFile() string {
+	tmpDirPath := os.TempDir()
+	f, err := ioutil.TempFile(tmpDirPath, "carton_dbTest")
+	if err != nil {
+		return ""
+	}
+	f.Close()
+	return f.Name()
 }

@@ -101,21 +101,34 @@ func fileHandler(
 func singleFileHandler(db db.DbManager) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		md5Hash := mux.Vars(r)["hash"]
-		c, err := db.GetFileByHash(md5Hash)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintln(w, "error decoding file")
-			return
-		}
-		if c == nil {
-			return404(w)
-			return
-		}
-		if c.PwdHash == nil {
-			// When file is downloaded, the file name is c.Name
-			w.Header().Set("Content-Disposition", "attachment; filename="+c.Name)
-			http.ServeFile(w, r, c.Path)
-		} else {
+		switch r.Method {
+		case "GET":
+			c, err := db.GetFileByHash(md5Hash)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintln(w, "error decoding file")
+				return
+			}
+			if c == nil {
+				return404(w)
+				return
+			}
+			if c.PwdHash == nil {
+				// When file is downloaded, the file name is c.Name
+				w.Header().Set("Content-Disposition", "attachment; filename="+c.Name)
+				http.ServeFile(w, r, c.Path)
+			} else {
+				return404(w)
+			}
+		case "DELETE":
+			err := db.DeleteFile(md5Hash)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintln(w, "error deleting file: %v", err)
+				return
+			}
+			fmt.Fprintln(w, "successfully deleted file")
+		default:
 			return404(w)
 		}
 	})

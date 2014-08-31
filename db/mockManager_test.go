@@ -40,6 +40,15 @@ func TestMockDb(t *testing.T) {
 		t.Error("Failed to get file by name")
 	}
 
+	err = db.DeleteFile("md5 hash")
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	c2, _ = db.GetFileByHash("md5 hash")
+	if c2 != nil {
+		t.Error("Failed to delete file")
+	}
+
 	db = NewMockDbManager(true)
 	err = db.RegisterUser("test user", []byte("test pass"))
 	if err == nil {

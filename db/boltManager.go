@@ -3,6 +3,7 @@ package db
 import (
 	"github.com/boltdb/bolt"
 	"github.com/markberger/carton/common"
+	"os"
 )
 
 type BoltManager struct {
@@ -115,6 +116,24 @@ func (m *BoltManager) GetFileByName(name string) *common.CartonFile {
 		return nil
 	})
 	return c
+}
+
+func (m *BoltManager) DeleteFile(hash string) error {
+	c, err := m.GetFileByHash(hash)
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove(c.Path)
+	if err != nil {
+		return err
+	}
+
+	err = m.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("files"))
+		return b.Delete([]byte(hash))
+	})
+	return err
 }
 
 func (m *BoltManager) GetAllFiles() ([]*common.CartonFile, error) {
