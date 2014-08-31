@@ -14,7 +14,7 @@
       </thead>
       <tbody>
         <tr ng-repeat="file in getFiles()" ng-click="setSelected(file)" ng-class="{fileSelected: selected === file}">
-          <td>{{file.name}}</td>
+          <td><a ng-click="download(file)">{{file.name}}</a></td>
         </tr>
       </tbody>
     </table>

@@ -107,6 +107,8 @@ func singleFileHandler(db db.DbManager) http.Handler {
 			return
 		}
 		if c.PwdHash == nil {
+			// When file is downloaded, the file name is c.Name
+			w.Header().Set("Content-Disposition", "attachment; filename="+c.Name)
 			http.ServeFile(w, r, c.Path)
 		} else {
 			return404(w)

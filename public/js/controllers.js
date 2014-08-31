@@ -108,6 +108,11 @@
                     return filesCtrl.files;
                 };
 
+                $scope.download = function(file) {
+                    var path = '/api/files/' + file.hash;
+                    window.open(path, '_blank', '');
+                }
+
                 $scope.apiGetFiles();
             }
         ])
