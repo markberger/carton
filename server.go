@@ -37,6 +37,7 @@ func registerVendor(m *mux.Router) {
 func main() {
 	b, _ := db.NewBoltManager("./bolt.db")
 	m := mux.NewRouter()
+	m.StrictSlash(true)
 	jar := sessions.NewCookieStore([]byte("secret key"))
 	os.Mkdir("./carton_files", os.ModeDir|0764)
 	api.RegisterHandlers(m, b, jar, "./carton_files")
