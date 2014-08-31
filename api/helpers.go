@@ -165,6 +165,10 @@ func (db *MockDbManager) GetFileByName(name string) (
 	}
 }
 
+func (db *MockDbManager) GetFileByHash(hash string) *common.CartonFile {
+	return nil
+}
+
 func (db *MockDbManager) GetAllFiles() ([]*common.CartonFile, error) {
 	files := []*common.CartonFile{}
 	for _, v := range db.files {

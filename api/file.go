@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/markberger/carton/common"
 	"github.com/markberger/carton/db"
@@ -91,6 +92,22 @@ func fileHandler(
 			db.AddFile(c)
 			w.WriteHeader(http.StatusCreated)
 			fmt.Fprintln(w, "upload succeeded")
+		} else {
+			return404(w)
+		}
+	})
+}
+
+func singleFileHandler(db db.DbManager) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		md5Hash := mux.Vars(r)["hash"]
+		c := db.GetFileByHash(md5Hash)
+		if c == nil {
+			return404(w)
+			return
+		}
+		if c.PwdHash == nil {
+			http.ServeFile(w, r, c.Path)
 		} else {
 			return404(w)
 		}

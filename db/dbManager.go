@@ -11,5 +11,6 @@ type DbManager interface {
 	AddFile(c *common.CartonFile) error
 	GetAllFiles() ([]*common.CartonFile, error)
 	GetFileByName(name string) (*common.CartonFile, error)
+	GetFileByHash(hash string) *common.CartonFile
 	Close() error
 }

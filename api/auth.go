@@ -172,9 +172,10 @@ func RegisterHandlers(
 	jar *sessions.CookieStore,
 	dest string,
 ) {
-	m.Handle("/api/auth/login", loginHandler(db, jar))
-	m.Handle("/api/auth/register", registerHandler(db, jar))
-	m.Handle("/api/auth/logout", logoutHandler(jar))
-	m.Handle("/api/auth/status", statusHandler(jar))
-	m.Handle("/api/files", fileHandler(db, jar, dest))
+	m.Handle("/api/auth/login/", loginHandler(db, jar))
+	m.Handle("/api/auth/register/", registerHandler(db, jar))
+	m.Handle("/api/auth/logout/", logoutHandler(jar))
+	m.Handle("/api/auth/status/", statusHandler(jar))
+	m.Handle("/api/files/", fileHandler(db, jar, dest))
+	m.Handle("/api/files/{hash}/", singleFileHandler(db))
 }

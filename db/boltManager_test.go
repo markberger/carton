@@ -100,7 +100,12 @@ func TestAddFile(t *testing.T) {
 		t.Errorf("Error getting file: %v", err)
 	}
 	if f.Name != c.Name {
-		t.Error("File names don't match.")
+		t.Error("File names don't match")
+	}
+
+	f = m.GetFileByHash("md5 hash")
+	if f.Name != c.Name {
+		t.Error("File names don't match")
 	}
 
 	m.Close()

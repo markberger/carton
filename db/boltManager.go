@@ -99,6 +99,26 @@ func (m *BoltManager) GetFileByName(name string) (
 	return c, err
 }
 
+// TODO: This should be an O(1) operation
+
+func (m *BoltManager) GetFileByHash(hash string) *common.CartonFile {
+	c := &common.CartonFile{}
+	m.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("files"))
+		cur := b.Cursor()
+
+		for k, v := cur.First(); k != nil; k, v = cur.Next() {
+			c.GobDecode(v)
+			if c.Md5Hash == hash {
+				return nil
+			}
+		}
+		c = nil
+		return nil
+	})
+	return c
+}
+
 func (m *BoltManager) GetAllFiles() ([]*common.CartonFile, error) {
 	files := []*common.CartonFile{}
 	err := m.db.View(func(tx *bolt.Tx) error {
