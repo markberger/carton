@@ -13,6 +13,10 @@
                 $state,
                 userSrv
             ) {
+                if(userSrv.isLogged == true) {
+                    $state.go('files');
+                }
+
                 $scope.login = function (user) {
                     $http.post('/api/auth/login', user)
 
@@ -38,6 +42,10 @@
                 $state,
                 userSrv
             ) {
+                if(userSrv.isLogged = true) {
+                    $state.go('files');
+                }
+
                 $scope.register = function(user) {
                     $http.post('/api/auth/register', user)
 
